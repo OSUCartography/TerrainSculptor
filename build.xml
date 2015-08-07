@@ -74,8 +74,9 @@
     
     <target name="-post-clean">
         <delete file="./win/TerrainSculptor.exe"/>
+        <delete file="./win/TerrainSculptorWin.zip"/>
         <delete dir="./mac/Terrain Sculptor.app/"/>
-        <delete file="./mac/Terrain Sculptor.zip/"/>
+        <delete file="./mac/TerrainSculptorMac.zip/"/>
     </target>
     
     <taskdef name="macbundleapp"
@@ -94,7 +95,7 @@
                       applicationCategory="public.app-category.graphics-design">
             <classpath file="${dist.jar}" />
         </macbundleapp>
-        <zip destfile="mac/TerrainSculptor.zip" level="9">
+        <zip destfile="mac/TerrainSculptorMac.zip" level="9">
             <zipfileset filemode="755" dir="mac/Terrain Sculptor.app" prefix="Terrain Sculptor.app" />
         </zip>
     </target>
@@ -110,7 +111,7 @@
 
         </jar>
 
-        <!-- Create a Macintosh program: copy the jar file into the app bundle. -->
+        <!-- Create a Macintosh program -->
         <antcall target="run.macappbundler"/>
        
         <!-- Create a Windows exe file using launch4j. -->
@@ -120,6 +121,19 @@
                  classpath="${launch4j.dir}/launch4j.jar
         :${launch4j.dir}/lib/xstream.jar" />
         <launch4j configFile="win/TerrainSculptor.xml" />
+        
+        
+        <!-- Zip the generated exe file -->
+        <zip destfile="win/TerrainSculptorWin.zip">
+            <fileset dir="win/" includes="TerrainSculptor.exe"/>
+        </zip>
+        
+        
+        <!-- zip the jar file -->
+        <zip destfile="dist/TerrainSculptorJar.zip" level="9">
+            <fileset dir="dist/" includes="TerrainSculptor.jar"/>
+        </zip>
+
         
     </target>
 </project>
