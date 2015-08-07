@@ -8,3 +8,6 @@ nbproject/private/*
 *.class
 
 build/*
+
+mac/Terrain Sculptor.app
+win/TerrainSculptor.exe
