@@ -1,5 +1,7 @@
 Terrain Sculptor 2.0
 
+http://terraincartography.com/terrainsculptor/
+
 This is a standalone version of Terrain Sculptor 2.0 for Netbeans 7. All required source files are included in a single project. External libraries are in ./lib/
 
 Text encoding of all files is MacRoman. The source requires Java SDK 6 or higher.
