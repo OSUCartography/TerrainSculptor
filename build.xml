@@ -111,11 +111,8 @@
         </jar>
 
         <!-- Create a Macintosh program: copy the jar file into the app bundle. -->
-         <antcall target="run.macappbundler"/>
-        <!--
-        <copy overwrite="true" file="${dist.jar}"
-              tofile="./mac/Terrain Sculptor.app/Contents/Resources/Java/TerrainSculptor.jar"/>
-        -->
+        <antcall target="run.macappbundler"/>
+       
         <!-- Create a Windows exe file using launch4j. -->
         <property name="launch4j.dir" location="win/launch4j" />
         <taskdef name="launch4j"

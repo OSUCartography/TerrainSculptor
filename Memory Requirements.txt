@@ -5,7 +5,7 @@ Terrain Sculptor is caching
 • 1 originalGrid
 • 1 detailedGrid (if original grid contains void values)
 • 1 slopeGrid
-• 7 cached results of  intermediate work packages
+• 7 cached results of  intermediate steps
 • 2 temporary grids (from grid pool) 
 • 1 image (same size as grids) with 2 bytes per pixel
 • 4 intermediate grids for display (final result, ridges, valleys, combination mask) if different from cached results of work packages
@@ -13,9 +13,9 @@ Terrain Sculptor is caching
 Maximum grids: 16 grids
 plus one image
 
-Example with 5000 x 5000 cells:
+The required memory for a grid with 5000 x 5000 cells is:
 5000 x 5000 x 4 / 1024 / 1024 x 16.5 = 1573 MB
 6753 x 10600 x 4 / 1024 / 1024 x 16.5 = 4505 MB
 
-Or roughly:
+Or approximately
 cells x rows / 15000
