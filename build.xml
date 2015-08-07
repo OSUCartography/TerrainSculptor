@@ -81,13 +81,13 @@
 
         <!-- Combine all jar files into a single jar. -->
         <jar compress="true" destfile="${dist.jar}" update="true">
-
-<!--
+            <!--
             <zipfileset src="${reference.GeoCore.jar}"/>
             <zipfileset src="${reference.Icons.jar}"/>
             <zipfileset src="${reference.Map.jar}"/>
             <zipfileset src="${reference.Utils.jar}"/>
--->
+            -->
+            
             <zipfileset src="./lib/MacIntegration.jar"/>
             <zipfileset src="./lib/MRJAdapter.jar"/>
 
@@ -97,6 +97,10 @@
 
         </jar>
 
+        <!-- Create a Macintosh program: copy the jar file into the app bundle. -->
+        <copy overwrite="true" file="${dist.jar}"
+              tofile="./mac/Terrain Sculptor.app/Contents/Resources/Java/TerrainSculptor.jar"/>
+        
         <!-- Create a Windows exe file using launch4j. -->
         <property name="launch4j.dir" location="win/launch4j" />
         <taskdef name="launch4j"
@@ -104,10 +108,6 @@
                  classpath="${launch4j.dir}/launch4j.jar
         :${launch4j.dir}/lib/xstream.jar" />
         <launch4j configFile="win/TerrainSculptor.xml" />
-
-        <!-- Create a Macintosh program: copy the jar file into the app bundle. -->
-        <copy overwrite="true" file="${dist.jar}"
-              tofile="./mac/Terrain Sculptor.app/Contents/Resources/Java/TerrainSculptor.jar"/>
         
     </target>
 </project>
