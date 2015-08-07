@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D;
 
 /**
  * Combines two grid. An optional grid with weights for linear weighting per 
- * cell can be used. An optional mask with NaN values can be used..
+ * cell can be used. An optional mask with NaN values can be used.
  * @author jenny
  */
 public class GridCombineOperator extends ThreadedGridOperator {

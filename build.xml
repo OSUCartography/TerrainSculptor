@@ -89,8 +89,8 @@
                       identifier="${main.class}"
                       mainclassname="${main.class}"
                       icon="mac/icon.icns"
-                      shortversion="2.0.1"
-                      copyright="© Bernhard Jenny, Anna Leonowicz"
+                      shortversion="2.0.2"
+                      copyright="© Bernhard Jenny, Anna Leonowicz, 2011–2015"
                       applicationCategory="public.app-category.graphics-design">
             <classpath file="${dist.jar}" />
         </macbundleapp>

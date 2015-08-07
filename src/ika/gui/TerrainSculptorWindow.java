@@ -312,9 +312,7 @@ public class TerrainSculptorWindow extends MainWindow
     }
 
     /**
-     * Displays a dialog with information about the original sourceGrid and the
-     * current bending.
-     */
+     * Displays a dialog with information about the original sourceGrid.  */
     public void showGridInfo() {
 
         try {
