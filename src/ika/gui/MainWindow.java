@@ -143,8 +143,7 @@ public abstract class MainWindow extends javax.swing.JFrame
             window.packedSize = window.getSize();
             
             // restore the size
-            window.setSize(size);
-            
+            window.setSize(size);            
         }
         
         return window;

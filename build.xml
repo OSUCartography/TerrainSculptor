@@ -74,23 +74,36 @@
     
     <target name="-post-clean">
         <delete file="./win/TerrainSculptor.exe"/>
-        <delete file="./mac/Terrain Sculptor.app/Contents/Resources/Java/TerrainSculptor.jar"/>
+        <delete dir="./mac/Terrain Sculptor.app/"/>
+        <delete file="./mac/Terrain Sculptor.zip/"/>
     </target>
+    
+    <taskdef name="macbundleapp"
+             classname="com.oracle.appbundler.AppBundlerTask"   
+             classpath="mac/appbundler-1.0.jar" />
 
+    <target name="run.macappbundler">
+        <macbundleapp outputdirectory="mac/"
+                      name="Terrain Sculptor"
+                      displayname="Terrain Sculptor"
+                      identifier="${main.class}"
+                      mainclassname="${main.class}"
+                      icon="mac/icon.icns"
+                      shortversion="2.0.1"
+                      copyright="© Bernhard Jenny, Anna Leonowicz"
+                      applicationCategory="public.app-category.graphics-design">
+            <classpath file="${dist.jar}" />
+        </macbundleapp>
+        <zip destfile="mac/TerrainSculptor.zip" level="9">
+            <zipfileset filemode="755" dir="mac/Terrain Sculptor.app" prefix="Terrain Sculptor.app" />
+        </zip>
+    </target>
+    
+    
     <target name="-post-jar">
 
         <!-- Combine all jar files into a single jar. -->
         <jar compress="true" destfile="${dist.jar}" update="true">
-            <!--
-            <zipfileset src="${reference.GeoCore.jar}"/>
-            <zipfileset src="${reference.Icons.jar}"/>
-            <zipfileset src="${reference.Map.jar}"/>
-            <zipfileset src="${reference.Utils.jar}"/>
-            -->
-            
-            <zipfileset src="./lib/MacIntegration.jar"/>
-            <zipfileset src="./lib/MRJAdapter.jar"/>
-
             <manifest>
                 <attribute value="${main.class}" name="Main-Class"/>
             </manifest>
@@ -98,9 +111,11 @@
         </jar>
 
         <!-- Create a Macintosh program: copy the jar file into the app bundle. -->
+         <antcall target="run.macappbundler"/>
+        <!--
         <copy overwrite="true" file="${dist.jar}"
               tofile="./mac/Terrain Sculptor.app/Contents/Resources/Java/TerrainSculptor.jar"/>
-        
+        -->
         <!-- Create a Windows exe file using launch4j. -->
         <property name="launch4j.dir" location="win/launch4j" />
         <taskdef name="launch4j"

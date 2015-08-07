@@ -107,7 +107,6 @@ public class TerrainSculptorWindow extends MainWindow
             public void windowChanged(WindowEvent e) {
                 TerrainSculptorWindow mainWindow = (TerrainSculptorWindow) e.getWindow();
                 mainWindow.updateAllMenus();
-                MacWindowsManager.updateFramelessMenuBar();
             }
 
             @Override
