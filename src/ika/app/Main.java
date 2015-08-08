@@ -3,28 +3,43 @@ package ika.app;
 import com.sanityinc.jargs.CmdLineParser;
 import com.sanityinc.jargs.CmdLineParser.IllegalOptionValueException;
 import com.sanityinc.jargs.CmdLineParser.Option;
-import ika.utils.IconUtils;
 import ika.geo.GeoGrid;
 import ika.geo.grid.TerrainSculptorFilter;
 import ika.geoexport.ESRIASCIIGridExporter;
 import ika.geoimport.ESRIASCIIGridReader;
 import ika.gui.*;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import ika.utils.ErrorDialog;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Main entry point.
- * 
+ *
  * Command line option contributed by Adrian Weber, University of Bern.
  *
  * @author Bernhard Jenny, Institute of Cartography, ETH Zurich
- * @author Adrian Weber, Centre for Development and Environment, University of Bern
+ * @author Adrian Weber, Centre for Development and Environment, University of
+ * Bern
  */
 public class Main {
 
     /**
-     * An ProgressIndicator implementation which sends messages to the standard
+     * Start the GUI version of Terrain Sculptor in a separate JVM to maximize
+     * the available heap memory space.
+     */
+    private static void launchGUIProcess() throws IOException {
+        String className = MainGUI.class.getName();
+        String xDockAppName = ApplicationInfo.getApplicationName();
+        ProcessLauncher processLauncher = new ProcessLauncher();
+        String xDockIconPath = processLauncher.findXDockIconPath("icon.icns");
+        processLauncher.startJVM(className, xDockAppName, xDockIconPath);
+    }
+
+    /**
+     * A ProgressIndicator implementation which sends messages to the standard
      * output.
      */
     private static class CmdLineProgress implements ProgressIndicator {
@@ -117,9 +132,9 @@ public class Main {
      */
     public static class IntegerRangeOption extends Option.IntegerOption {
 
-        private int minValue;
-        private int maxValue;
-        private int defaultValue;
+        private final int minValue;
+        private final int maxValue;
+        private final int defaultValue;
 
         /**
          *
@@ -209,57 +224,29 @@ public class Main {
             System.exit(0);
         }
 
+        List inputArgs = ManagementFactory.getRuntimeMXBean().getInputArguments();
+        boolean isDebug = inputArgs.contains("-Xdebug");
+
         // Get the remaining arguments. 
         String[] remainingArgs = parser.getRemainingArgs();
         // If neither a source nor a destination elevation model is set, start
         // the GUI application.
         if (remainingArgs.length != 2) {
-
-            // on Mac OS X: take the menu bar out of the window and put it on top
-            // of the main screen.
-            if (ika.utils.Sys.isMacOSX()) {
-                System.setProperty("apple.laf.useScreenMenuBar", "true");
-            }
-
-            // use the standard look and feel
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // set icon for JOptionPane dialogs. This is done automatically on Mac 10.5.
-            if (!ika.utils.Sys.isMacOSX_10_5_orHigherWithJava5()) {
-                java.util.Properties props
-                        = ika.utils.PropertiesLoader.loadProperties("ika.app.Application");
-                IconUtils.setOptionPaneIcons(props.getProperty("ApplicationIcon"));
-            }
-
-            // RepaintManager.setCurrentManager(new ThreadCheckingRepaintManager(false));
-            // Replace title of progress monitor dialog by empty string.
-            UIManager.put("ProgressMonitor.progressText", "");
-
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    // create a new empty window
-                    TerrainSculptorWindow w = (TerrainSculptorWindow) MainWindow.newDocumentWindow();
-                    w.setExtendedState(w.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-
-                    /*
-                     // initialize output and error stream for display in a window
-                     String appName = ika.app.ApplicationInfo.getApplicationName();
-                     String outTitle = appName + " - Standard Output";
-                     String errTitle = appName + " - Error Messages";
-                     new ika.utils.StdErrOutWindows(null, outTitle, errTitle);
-                     */
+            // when in debug mode, directly call main method for GUI version
+            // otherwise launch it in a new process to maximize heap space.
+            if (isDebug) {
+                MainGUI.main(args);
+            } else {
+                try {
+                    launchGUIProcess();
+                    System.exit(0);
+                } catch (IOException ex) {
+                    MainGUI.main(args);
                 }
-            });            
+            }
         } else {
-
             // In other cases start the application in batch mode with the arguments
             // set on the command line.
-            
             CmdLineProgress p = new CmdLineProgress();
 
             // Create a new grid filter

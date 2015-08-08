@@ -129,11 +129,10 @@
         </zip>
         
         
-        <!-- zip the jar file -->
+        <!-- Zip the jar file -->
         <zip destfile="dist/TerrainSculptorJar.zip" level="9">
             <fileset dir="dist/" includes="TerrainSculptor.jar"/>
         </zip>
-
         
     </target>
 </project>
