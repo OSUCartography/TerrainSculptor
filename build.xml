@@ -90,7 +90,7 @@
                       identifier="${main.class}"
                       mainclassname="${main.class}"
                       icon="mac/icon.icns"
-                      shortversion="2.0.2"
+                      shortversion="2.1.0"
                       copyright="© Bernhard Jenny, Anna Leonowicz, 2011–2015"
                       applicationCategory="public.app-category.graphics-design">
             <classpath file="${dist.jar}" />

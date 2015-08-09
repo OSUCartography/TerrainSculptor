@@ -345,7 +345,7 @@ public class GeoExportGUI {
                 ika.utils.ErrorDialog.showErrorDialog("The file could not be exported.", e);
                 throw e;
             } finally {
-                progressIndicator.completeProgress();
+                progressIndicator.complete();
             }
         }
     }

@@ -5,10 +5,10 @@
  */
 package ika.gui;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JComponent;
+import javax.swing.Action;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 /**
  * ProgressPanel displays a progress dialog for lengthy operations.
@@ -27,14 +27,9 @@ public class TerrainSculptorProgressPanel extends javax.swing.JPanel {
      * Creates new form ProgressPanel.
      * Must be called from the Swing Event Dispatch Thread!
      */
-    public TerrainSculptorProgressPanel(String message, ActionListener cancelActionListener) {
+    public TerrainSculptorProgressPanel() {
+        assert (SwingUtilities.isEventDispatchThread());
         this.initComponents();
-        cancelButton.addActionListener(cancelActionListener);
-        this.cancelButton.registerKeyboardAction(cancelActionListener, "EscapeKey",
-                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE,
-                0, true), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        this.setMessage(message);
-
     }
 
     /** This method is called from within the constructor to
@@ -90,40 +85,77 @@ public class TerrainSculptorProgressPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     /**
+     * @param cancelAction A callback handler that is called when the
+     * user presses the cancel button or the escape key.
+     */
+    public void setCancelAction(Action cancelAction) {
+        assert (SwingUtilities.isEventDispatchThread());
+        cancelButton.addActionListener(cancelAction);
+        cancelButton.getInputMap().put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE,
+                0, true), "EscapeKey");
+        cancelButton.getActionMap().put("EscapeKey", cancelAction);
+    }
+    
+    /**
+     * removeActionListeners() must be called when the panel is no longer needed and the
+     * parent dialog is disposed. This is to avoid a memory leak that may fill
+     * up heap space when listeners are not removed (which make garbage
+     * collecting a Frame impossible). Must be called from the Swing Event
+     * Dispatch Thread.
+     */
+    public void removeActionListeners() {
+        assert (SwingUtilities.isEventDispatchThread());
+        ActionListener[] als = cancelButton.getActionListeners();
+        for (ActionListener al : als) {
+            cancelButton.removeActionListener(al);
+        }
+        cancelButton.getInputMap().clear();
+        cancelButton.getActionMap().clear();
+    }
+    
+    /**
      * start action. Setup the dialog and remember the current time.
      */
     public void start() {
+        assert (SwingUtilities.isEventDispatchThread());
         progressBar.setValue(0);
         cancelButton.setEnabled(true);
         progressBar.setIndeterminate(false);
     }
 
     public void updateProgressGUI(final int percentage) {
+        assert (SwingUtilities.isEventDispatchThread());
         progressBar.setIndeterminate(false);
         progressBar.setValue(percentage);
     }
 
     public void disableCancel() {
+        assert (SwingUtilities.isEventDispatchThread());
         cancelButton.setEnabled(false);
     }
 
     public void enableCancel() {
+        assert (SwingUtilities.isEventDispatchThread());
         cancelButton.setEnabled(true);
     }
 
     public void setMessage(final String msg) {
+        assert (SwingUtilities.isEventDispatchThread());
         messageLabel.setText(msg);
     }
 
     public void setIndeterminate(boolean indeterminate) {
+        assert (SwingUtilities.isEventDispatchThread());
         progressBar.setIndeterminate(indeterminate);
     }
     
     public void setDeferredFiltering(boolean deferredFiltering) {
+        assert (SwingUtilities.isEventDispatchThread());
         deferredFilteringCheckBox.setSelected(deferredFiltering);
     }
     
     public boolean isDeferredFiltering() {
+        assert (SwingUtilities.isEventDispatchThread());
         return deferredFilteringCheckBox.isSelected();
     }
     

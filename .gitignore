@@ -11,3 +11,6 @@ build/*
 
 mac/Terrain Sculptor.app
 win/TerrainSculptor.exe
+dist/TerrainSculptor.jar
+
+mac/Terrain Sculptor.app/*

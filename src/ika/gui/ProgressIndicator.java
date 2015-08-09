@@ -28,7 +28,7 @@ public interface ProgressIndicator {
      * complete() is called to inform that the operation terminated. The GUI should
      * be cleaned up.
      */
-    public void completeProgress();
+    public void complete();
 
     /**
      * progress() informs of the progress of the current task.
@@ -78,11 +78,6 @@ public interface ProgressIndicator {
      * Switch to the next task.
      */
     public void nextTask();
-
-    /**
-     * Switch to the next task and change the message text.
-     */
-    public void nextTask (String message);
 
     /**
      * Returns the ID of the current task. The first task has ID 1 (and not 0).

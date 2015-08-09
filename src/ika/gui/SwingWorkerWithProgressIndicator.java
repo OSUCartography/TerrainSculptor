@@ -4,6 +4,8 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -75,13 +77,17 @@ public abstract class SwingWorkerWithProgressIndicator<T> extends SwingWorker<T,
         dialog.setModal(blockOwner);
         dialog.setResizable(false);
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        ActionListener cancelActionListener = new java.awt.event.ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                abort();
-            }
-        };
-        progressPanel = new ProgressPanel(message, cancelActionListener);
+        Action cancelAction = new AbstractAction() {
+            @Override
+             public void actionPerformed(ActionEvent e) {
+                 abort();
+             }
+         };
+        
+        progressPanel = new ProgressPanel();
+        progressPanel.setMessage(message);
+        progressPanel.setCancelAction(cancelAction);
+        
         dialog.setContentPane(progressPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(owner);
@@ -133,11 +139,12 @@ public abstract class SwingWorkerWithProgressIndicator<T> extends SwingWorker<T,
     /**
      * Inform the dialog that the operation has completed and it can be hidden.
      */
-    public void completeProgress() {
+    public void complete() {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
                 dialog.setVisible(false);
+                progressPanel.removeActionListeners();
             }
         });
     }

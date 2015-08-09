@@ -284,7 +284,7 @@ public class TerrainSculptorWindow extends MainWindow
                     ErrorDialog.showErrorDialog(msg, errTitle(), ex, TerrainSculptorWindow.this);
                     return;
                 } finally {
-                    completeProgress();
+                    complete();
                 }
             }
 
@@ -438,7 +438,7 @@ public class TerrainSculptorWindow extends MainWindow
                         resetExportMenu();
                         resetMap(hadGrids);
                     } finally {
-                        completeProgress();
+                        complete();
                     }
                 }
             }

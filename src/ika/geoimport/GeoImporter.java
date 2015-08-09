@@ -332,7 +332,7 @@ public abstract class GeoImporter extends Thread {
         } catch (Exception e) {
             // hide the progress dialog
             if (progressIndicator != null && callProgressComplete) {
-                progressIndicator.completeProgress();
+                progressIndicator.complete();
             }
 
             // pass the exception to the DataReceiver, which is responsible for
@@ -340,7 +340,7 @@ public abstract class GeoImporter extends Thread {
             threadParams.dataReceiver.error(e, threadParams.url);
         } finally {
             if (this.progressIndicator != null && this.callProgressComplete) {
-                this.progressIndicator.completeProgress();
+                this.progressIndicator.complete();
             }
         }
     }

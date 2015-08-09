@@ -58,7 +58,7 @@ public class Main {
         }
 
         @Override
-        public void completeProgress() {
+        public void complete() {
         }
 
         @Override
@@ -97,10 +97,6 @@ public class Main {
 
         @Override
         public void nextTask() {
-        }
-
-        @Override
-        public void nextTask(String message) {
         }
 
         @Override
