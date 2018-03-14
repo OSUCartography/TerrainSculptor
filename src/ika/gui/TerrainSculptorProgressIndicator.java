@@ -22,7 +22,8 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
      */
     protected TerrainSculptorProgressPanel progressPanel;
     /**
-     * The dialog to display the progressPanel. Must be accessed by the Swing thread only.
+     * The dialog to display the progressPanel. Must be accessed by the Swing
+     * thread only.
      */
     protected JDialog dialog;
     /**
@@ -30,7 +31,8 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
      */
     protected Frame owner;
     /**
-     * aborted is true after abort() is called. Access to aborted must be synchronized.
+     * aborted is true after abort() is called. Access to aborted must be
+     * synchronized.
      */
     private boolean aborted = false;
     /**
@@ -38,7 +40,7 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
      */
     private boolean indeterminate;
     /**
-     * The number of tasks to excecute. The default is 1.
+     * The number of tasks to execute. The default is 1.
      */
     private int totalTasksCount = 1;
     /**
@@ -46,10 +48,10 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
      */
     private int currentTask = 1;
     /**
-     * If an operation takes less time than maxTimeWithoutDialog, no dialog is
-     * shown. Unit: milliseconds.
+     * If an operation takes less time than maxTimeWithoutDialogMilliSec, no
+     * dialog is shown. Unit: milliseconds.
      */
-    private int maxTimeWithoutDialog = 2000;
+    private int maxTimeWithoutDialogMilliSec = 2000;
     /**
      * Time in milliseconds when the operation started.
      */
@@ -57,6 +59,7 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
 
     /**
      * Must be called in the Event Dispatching Thread.
+     *
      * @param owner
      * @param dialogTitle
      * @param message
@@ -67,8 +70,8 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
             String message,
             boolean blockOwner) {
 
-        assert(SwingUtilities.isEventDispatchThread());
-        
+        assert (SwingUtilities.isEventDispatchThread());
+
         this.owner = owner;
 
         // prepare the dialog
@@ -77,17 +80,17 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
         dialog.setModal(blockOwner);
         dialog.setResizable(false);
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        
+
         Action cancelAction = new AbstractAction() {
             @Override
-             public void actionPerformed(ActionEvent e) {
-                 abort();
-             }
-         };
+            public void actionPerformed(ActionEvent e) {
+                abort();
+            }
+        };
         progressPanel = new TerrainSculptorProgressPanel();
         progressPanel.setMessage(message);
         progressPanel.setCancelAction(cancelAction);
-        
+
         dialog.setContentPane(progressPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(owner);
@@ -118,9 +121,9 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
     }
 
     /**
-     * Stop the operation. The dialog will be hidden and the operation will
-     * stop as soon as possible. This might not happen synchronously. Can be
-     * called from any thread.
+     * Stop the operation. The dialog will be hidden and the operation will stop
+     * as soon as possible. This might not happen synchronously. Can be called
+     * from any thread.
      */
     public void abort() {
         synchronized (this) {
@@ -151,6 +154,7 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
 
     /**
      * Update the progress indicator.
+     *
      * @param percentage A value between 0 and 100.
      * @return True if the operation should continue, false otherwise.
      */
@@ -162,6 +166,7 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
 
     /**
      * Returns whether this operation should stop.
+     *
      * @return
      */
     public boolean isAborted() {
@@ -199,8 +204,9 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
     }
 
     /**
-     * Invoked when the task's publish() method is called. Update the value displayed
-     * by the progress dialog. This is called from within the event dispatching thread.
+     * Invoked when the task's publish() method is called. Update the value
+     * displayed by the progress dialog. This is called from within the event
+     * dispatching thread.
      */
     @Override
     protected void process(List<Integer> progressList) {
@@ -213,17 +219,6 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
 
         if (dialog.isVisible()) {
             this.progressPanel.updateProgressGUI(progress);
-        } else {
-            // make the dialog visible if necessary
-            // Don't show the dialog for short operations.
-            // Only show it when half of maxTimeWithoutDialog has passed
-            // and the operation has not yet completed half of its task.
-            final long currentTime = System.currentTimeMillis();
-            if (currentTime - startTime > maxTimeWithoutDialog / 2 && progress < 50) {
-                // show the dialog
-                dialog.pack();
-                dialog.setVisible(true);
-            }
         }
     }
 
@@ -234,10 +229,11 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
     public boolean isDeferredFiltering() {
         return progressPanel.isDeferredFiltering();
     }
-    
-    /** ShowDialogTask is a timer that makes sure the progress dialog
-     * is shown if progress() is not called for a long time. In this case, the
-     * dialog would never become visible.
+
+    /**
+     * ShowDialogTask is a timer that makes sure the progress dialog is shown if
+     * progress() is not called for a long time. In this case, the dialog would
+     * never become visible.
      */
     private class ShowDialogTask implements ActionListener {
 
@@ -245,11 +241,12 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
         }
 
         /**
-         * Start a timer that will show the dialog in maxTimeWithoutDialog
-         * milliseconds if the dialog is not visible until then.
+         * Start a timer that will show the dialog in
+         * maxTimeWithoutDialogMilliSec milliseconds if the dialog is not
+         * visible until then.
          */
         private void start() {
-            javax.swing.Timer timer = new javax.swing.Timer(getMaxTimeWithoutDialog(), this);
+            javax.swing.Timer timer = new javax.swing.Timer(getMaxTimeWithoutDialogMilliSec(), this);
             timer.setRepeats(false);
             timer.start();
         }
@@ -258,19 +255,21 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
          * Show the dialog if it is not visible yet and if the operation has not
          * yet finished.
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
 
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     // only make the dialog visible if the operation is not
                     // yet finished
-                    if (isAborted() || dialog.isVisible()) {
+                    if (isDone() || dialog.isVisible()) {
                         return;
                     }
 
                     // don't know how long the operation will take.
-                    progressPanel.setIndeterminate(true);
+                    //progressPanel.setIndeterminate(true);
 
                     // show the dialog
                     dialog.pack();
@@ -280,18 +279,19 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
         }
     }
 
-    public int getMaxTimeWithoutDialog() {
-        return maxTimeWithoutDialog;
+    public int getMaxTimeWithoutDialogMilliSec() {
+        return maxTimeWithoutDialogMilliSec;
     }
 
-    public void setMaxTimeWithoutDialog(int maxTimeWithoutDialog) {
-        this.maxTimeWithoutDialog = maxTimeWithoutDialog;
+    public void setMaxTimeWithoutDialogMilliSec(int maxTimeWithoutDialogMilliSec) {
+        this.maxTimeWithoutDialogMilliSec = maxTimeWithoutDialogMilliSec;
     }
 
     /**
-     * Sets the number of tasks. Each task has a progress between 0 and 100.
-     * If the number of tasks is larger than 1, progress of task 1 will be
-     * rescaled to 0..50.
+     * Sets the number of tasks. Each task has a progress between 0 and 100. If
+     * the number of tasks is larger than 1, progress of task 1 will be rescaled
+     * to 0..50.
+     *
      * @param tasksCount The total number of tasks.
      */
     public void setTotalTasksCount(int tasksCount) {
@@ -302,6 +302,7 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
 
     /**
      * Returns the total numbers of tasks for this progress indicator.
+     *
      * @return The total numbers of tasks.
      */
     public int getTotalTasksCount() {
@@ -327,13 +328,14 @@ public abstract class TerrainSculptorProgressIndicator<T> extends SwingWorker<T,
         }
     }
 
-    public void nextTask (String message) {
+    public void nextTask(String message) {
         this.nextTask();
         this.setMessage(message);
     }
 
     /**
      * Returns the ID of the current task. The first task has ID 1 (and not 0).
+     *
      * @return The ID of the current task.
      */
     public int currentTask() {
