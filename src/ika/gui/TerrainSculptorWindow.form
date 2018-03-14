@@ -826,7 +826,7 @@
                         <Property name="value" type="int" value="10"/>
                       </Properties>
                       <Events>
-                        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="filterSliderStateChanged,lodSliderStateChanged"/>
+                        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="lodSliderStateChanged"/>
                       </Events>
                       <AuxValues>
                         <AuxValue name="JavaCodeGenerator_allCodePost" type="java.lang.String" value="{&#xa;ika.gui.SliderUtils.setMinMaxSliderLabels(meanFilterLoopsSlider, new String[]{&quot;Detailed&quot;, &quot;Smooth&quot;});&#xa;ika.gui.SliderUtils.reapplyFontSize(meanFilterLoopsSlider);&#xa;}"/>
@@ -978,7 +978,7 @@
                                 <Property name="value" type="int" value="5"/>
                               </Properties>
                               <Events>
-                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="filterSliderStateChanged,valleysSliderStateChanged"/>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="valleysSliderStateChanged"/>
                               </Events>
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -1010,7 +1010,7 @@
                                 <Property name="inverted" type="boolean" value="true"/>
                               </Properties>
                               <Events>
-                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="filterSliderStateChanged,valleysSliderStateChanged"/>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="valleysSliderStateChanged"/>
                               </Events>
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -1040,7 +1040,7 @@
                                 <Property name="inverted" type="boolean" value="true"/>
                               </Properties>
                               <Events>
-                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="filterSliderStateChanged,valleysSliderStateChanged"/>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="valleysSliderStateChanged"/>
                               </Events>
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -1105,7 +1105,7 @@
                                 <Property name="value" type="int" value="5"/>
                               </Properties>
                               <Events>
-                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="filterSliderStateChanged,ridgesSliderStateChanged"/>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="ridgesSliderStateChanged"/>
                               </Events>
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -1148,7 +1148,7 @@
                                 <Property name="value" type="int" value="500"/>
                               </Properties>
                               <Events>
-                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="filterSliderStateChanged,ridgesSliderStateChanged"/>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="ridgesSliderStateChanged"/>
                               </Events>
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -1180,7 +1180,7 @@
                                 <Property name="valueIsAdjusting" type="boolean" value="true"/>
                               </Properties>
                               <Events>
-                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="filterSliderStateChanged,ridgesSliderStateChanged"/>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="ridgesSliderStateChanged"/>
                               </Events>
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -1225,7 +1225,7 @@
                             <Property name="value" type="int" value="15"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="combinationSlopeThresholdSliderStateChanged,filterSliderStateChanged"/>
+                            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="combinationSlopeThresholdSliderStateChanged"/>
                           </Events>
                           <AuxValues>
                             <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="{&#xa;//Create the label table&#xa;Hashtable labelTable = new Hashtable();&#xa;labelTable.put( new Integer( 0 ), new JLabel(&quot;Lowlands&quot;) );&#xa;labelTable.put( new Integer( 45 ), new JLabel(&quot;Mountains&quot;) );&#xa;combinationSlopeThresholdSlider.setLabelTable( labelTable );&#xa;}"/>

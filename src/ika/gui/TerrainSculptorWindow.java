@@ -32,12 +32,12 @@ import javax.swing.*;
 
 /**
  * A document window containing a map.
- * @author  Bernhard Jenny, Institute of Cartography, ETH Zurich.
+ *
+ * @author Bernhard Jenny, Institute of Cartography, ETH Zurich.
  */
 public class TerrainSculptorWindow extends MainWindow
         implements RenderParamsProvider {
 
-    
     // names of grids that are displayed in the map
     public static final ArrayList<String> GRID_NAMES = new ArrayList<String>();
 
@@ -53,7 +53,7 @@ public class TerrainSculptorWindow extends MainWindow
     private boolean adjustingGUI = false;
     private RecentDocumentsManager rdm;
     private boolean deferredFiltering = false;
-    
+
     /**
      * Creates new form BaseMainWindow
      */
@@ -73,7 +73,7 @@ public class TerrainSculptorWindow extends MainWindow
         this.mapComponent.setRenderParamsProvider(this);
 
         mapComponent.getPageFormat().setVisible(false);
-        
+
         // add a MapEventListener: When the map changes, the dirty
         // flag is set and the Save menu item updated.
         MapEventListener mel = new MapEventListener() {
@@ -146,7 +146,6 @@ public class TerrainSculptorWindow extends MainWindow
 
         // setup undo/redo
         //this.mapComponent.registerUndoMenuItems(this.undoMenuItem, this.redoMenuItem);
-
         // initialize the undo/redo manager with the current (empty) map content.
         this.mapComponent.addUndo(null);
 
@@ -158,14 +157,14 @@ public class TerrainSculptorWindow extends MainWindow
             }
         });
         writeGUI();
-        
+
         showNoTerrainMessage();
     }
 
     private String errTitle() {
         return appName() + " Error";
     }
-    
+
     private void initRecentDocumentsMenu(final Component parent) {
         rdm = new RecentDocumentsManager() {
 
@@ -223,7 +222,7 @@ public class TerrainSculptorWindow extends MainWindow
         }
 
     }
-    
+
     private void showNoTerrainMessage() {
         String msg = "Open a terrain model with File > Open Terrain\u2026";
         mapComponent.setInfoString(msg);
@@ -232,6 +231,7 @@ public class TerrainSculptorWindow extends MainWindow
 
     /**
      * Read a grid file asynchronously.
+     *
      * @param filePath
      */
     public void openDEM(final String filePath) {
@@ -312,7 +312,8 @@ public class TerrainSculptorWindow extends MainWindow
     }
 
     /**
-     * Displays a dialog with information about the original sourceGrid.  */
+     * Displays a dialog with information about the original sourceGrid.
+     */
     public void showGridInfo() {
 
         try {
@@ -407,10 +408,22 @@ public class TerrainSculptorWindow extends MainWindow
         worker = new TerrainSculptorProgressIndicator<ArrayList<GeoGrid>>(
                 this, appName() + " - Filtering", "", true) {
 
+            private void closeProgressGUI(boolean hadGrids) {
+                deferredFiltering = isDeferredFiltering();
+                updateEditMenu(); // enable Filter command
+                try {
+                    resetExportMenu();
+                    resetMap(hadGrids);
+                } finally {
+                    complete();
+                }
+            }
+
             @Override
             public void done() {
 
-                boolean hadGrids = (displayGrids != null) && displayGrids.size() > 0;
+                final boolean hadGrids = (displayGrids != null) && displayGrids.size() > 0;
+
                 try {
                     ArrayList<GeoGrid> newGrids = get(); // also tests for exceptions
                     if (newGrids == null) {
@@ -418,27 +431,34 @@ public class TerrainSculptorWindow extends MainWindow
                     }
                     displayGrids = newGrids;
                     mapComponent.setInfoString("");
-                    
                 } catch (Throwable ex) {
                     String exmsg = ex.getMessage();
                     if (exmsg != null && exmsg.contains("user canceled")) {
                         // show button to restart filtering
-                        CardLayout cl = (CardLayout)(centerPanel.getLayout());
+                        CardLayout cl = (CardLayout) (centerPanel.getLayout());
                         cl.show(centerPanel, "filterButton");
                         filteringStatusLabel.setText("Filtering has been canceled.");
                         return;
                     }
-                    ex.printStackTrace();
+                    Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
                     String msg = "An error occured";
                     ErrorDialog.showErrorDialog(msg, errTitle(), ex, TerrainSculptorWindow.this);
                 } finally {
-                    deferredFiltering = isDeferredFiltering();
-                    updateEditMenu(); // enable Filter command
-                    try {
-                        resetExportMenu();
-                        resetMap(hadGrids);
-                    } finally {
-                        complete();
+                    // bug in SwingWorker: done is not called in the Event Dispatching
+                    // Thread if cancel() was called.
+                    // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6826514
+                    // Also, if doInBackground() is cancelled, done() might be called
+                    // before doInBackground has finished.
+                    if (isCancelled()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                closeProgressGUI(hadGrids);
+                            }
+                        });
+                        return;
+                    } else {
+                        closeProgressGUI(hadGrids);
                     }
                 }
             }
@@ -454,7 +474,7 @@ public class TerrainSculptorWindow extends MainWindow
         };
 
         worker.setDeferredFiltering(deferredFiltering);
-        worker.setMaxTimeWithoutDialog(1);
+        worker.setMaxTimeWithoutDialogMilliSec(2000);
         worker.setMessage("");
         worker.setTotalTasksCount(7);
         worker.setIndeterminate(false);
@@ -501,7 +521,7 @@ public class TerrainSculptorWindow extends MainWindow
 
     }
 
-    /** 
+    /**
      * Mac OS X specific initialization.
      */
     private void initMenusForMac() {
@@ -530,8 +550,8 @@ public class TerrainSculptorWindow extends MainWindow
     }
 
     /**
-     * Customize the passed defaultRenderParams.
-     * This implementation does not alter the passed parameters.
+     * Customize the passed defaultRenderParams. This implementation does not
+     * alter the passed parameters.
      */
     @Override
     public RenderParams getRenderParams(RenderParams defaultRenderParams) {
@@ -555,6 +575,7 @@ public class TerrainSculptorWindow extends MainWindow
 
     /**
      * Return data that can be stored in an external file.
+     *
      * @return The document content.
      */
     @Override
@@ -569,6 +590,7 @@ public class TerrainSculptorWindow extends MainWindow
 
     /**
      * Restore the document content from a passed GeoMap.
+     *
      * @param data The document content.
      */
     @Override
@@ -603,7 +625,7 @@ public class TerrainSculptorWindow extends MainWindow
     }
 
     private static Component getVisibleCard(JPanel panel) {
-        
+
         for (Component comp : panel.getComponents()) {
             if (comp.isVisible() == true) {
                 return comp;
@@ -611,7 +633,7 @@ public class TerrainSculptorWindow extends MainWindow
         }
         return null;
     }
-    
+
     /**
      * Update the enabled/disabled state of the items in the edit menu.
      */
@@ -620,7 +642,6 @@ public class TerrainSculptorWindow extends MainWindow
         boolean mapHasSelectedObj = mapComponent.hasSelectedGeoObjects();
 
         // undo and redo menu items are handled by the Undo manager.
-
         deleteMenuItem.setEnabled(mapHasSelectedObj);
         copyMenuItem.setEnabled(mapHasSelectedObj);
         cutMenuItem.setEnabled(mapHasSelectedObj);
@@ -629,7 +650,7 @@ public class TerrainSculptorWindow extends MainWindow
         gridInfoMenuItem.setEnabled(gridFilter.getGrid() != null);
         scaleTerrainMenuItem.setEnabled(gridFilter.getGrid() != null);
         voidValuesMenuItem.setEnabled(gridFilter.getGrid() != null);
-        
+
         deferredFilteringCheckBoxMenuItem.setSelected(deferredFiltering);
     }
 
@@ -661,8 +682,9 @@ public class TerrainSculptorWindow extends MainWindow
     }
 
     /**
-     * Export the map to a file. The user is asked to select a file path to a 
+     * Export the map to a file. The user is asked to select a file path to a
      * new file.
+     *
      * @param exporter The GeoSetExporter to export the map.
      */
     private void export(ika.geoexport.GeoSetExporter exporter) {
@@ -674,8 +696,9 @@ public class TerrainSculptorWindow extends MainWindow
     }
 
     /**
-     * Export the map to a raster image file. The user is asked to select a
-     * file path to a new file.
+     * Export the map to a raster image file. The user is asked to select a file
+     * path to a new file.
+     *
      * @param format The format of the raster image, e.g. "jpg" or "png".
      */
     private void exportToRasterImage(String format) {
@@ -684,10 +707,10 @@ public class TerrainSculptorWindow extends MainWindow
         this.export(exporter);
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -1024,7 +1047,7 @@ public class TerrainSculptorWindow extends MainWindow
         viewMenuButton.setToolTipText("Select the data displayed.");
         viewMenuButton.setBorderPainted(false);
         viewMenuButton.setContentAreaFilled(false);
-        viewMenuButton.setFont(new java.awt.Font("SansSerif", 0, 13));
+        viewMenuButton.setFont(new java.awt.Font("SansSerif", 0, 13)); // NOI18N
         viewMenuButton.setPopupMenu(viewPopupMenu);
         topLeftPanel.add(viewMenuButton);
 
@@ -1045,7 +1068,6 @@ public class TerrainSculptorWindow extends MainWindow
         meanFilterLoopsSlider.setValue(10);
         meanFilterLoopsSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                filterSliderStateChanged(evt);
                 lodSliderStateChanged(evt);
             }
         });
@@ -1119,7 +1141,6 @@ public class TerrainSculptorWindow extends MainWindow
         valleysMeanFilterLoopsSlider.setValue(5);
         valleysMeanFilterLoopsSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                filterSliderStateChanged(evt);
                 valleysSliderStateChanged(evt);
             }
         });
@@ -1144,7 +1165,6 @@ public class TerrainSculptorWindow extends MainWindow
         valleysExaggerationSlider.setInverted(true);
         valleysExaggerationSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                filterSliderStateChanged(evt);
                 valleysSliderStateChanged(evt);
             }
         });
@@ -1168,7 +1188,6 @@ public class TerrainSculptorWindow extends MainWindow
         valleysCurvatureThresholdSlider.setInverted(true);
         valleysCurvatureThresholdSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                filterSliderStateChanged(evt);
                 valleysSliderStateChanged(evt);
             }
         });
@@ -1201,7 +1220,6 @@ public class TerrainSculptorWindow extends MainWindow
         ridgesMeanFilterLoopsSlider.setValue(5);
         ridgesMeanFilterLoopsSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                filterSliderStateChanged(evt);
                 ridgesSliderStateChanged(evt);
             }
         });
@@ -1232,7 +1250,6 @@ public class TerrainSculptorWindow extends MainWindow
         ridgesExaggerationSlider.setValue(500);
         ridgesExaggerationSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                filterSliderStateChanged(evt);
                 ridgesSliderStateChanged(evt);
             }
         });
@@ -1258,7 +1275,6 @@ public class TerrainSculptorWindow extends MainWindow
         planCurvatureWeightSlider.setValueIsAdjusting(true);
         planCurvatureWeightSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                filterSliderStateChanged(evt);
                 ridgesSliderStateChanged(evt);
             }
         });
@@ -1299,7 +1315,6 @@ public class TerrainSculptorWindow extends MainWindow
         combinationSlopeThresholdSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 combinationSlopeThresholdSliderStateChanged(evt);
-                filterSliderStateChanged(evt);
             }
         });
         {
@@ -1317,7 +1332,7 @@ public class TerrainSculptorWindow extends MainWindow
         combinationPanel.add(combinationSlopeThresholdSlider, gridBagConstraints);
 
         jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("SansSerif", 0, 11));
+        jTextArea1.setFont(new java.awt.Font("SansSerif", 0, 11)); // NOI18N
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
         jTextArea1.setText("Adjust the combination mask: the lowland shading is used where the combination mask is black, and the mountain shading is used where the combination mask is white.");
@@ -1923,6 +1938,7 @@ private void viewMenuActionHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:
 
     /**
      * Interpolate value for scale slider between medium and small scale.
+     *
      * @param y50 y value at 50 (medium scale)
      * @param y100 y value at 100 (small scale)
      * @param x Between 50 and 100
@@ -1936,6 +1952,7 @@ private void viewMenuActionHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:
 
     /**
      * Interpolate value for scale slider between large and medium scale.
+     *
      * @param y0 y value at 0 (large scale)
      * @param y50 y value at 50 (medium scale)
      * @param x x value between 0 and 50
@@ -1988,7 +2005,7 @@ private void viewMenuActionHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:
     }
 
 private void scaleSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_scaleSliderStateChanged
-    if (!scaleSlider.getValueIsAdjusting()) {
+    if (!scaleSlider.getValueIsAdjusting() && !adjustingGUI) {
         interpolateBasicParameters(scaleSlider.getValue());
     }
 }//GEN-LAST:event_scaleSliderStateChanged
@@ -2011,8 +2028,8 @@ private void systemInfoMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 }//GEN-LAST:event_systemInfoMenuItemActionPerformed
 
 private void onlineManualMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onlineManualMenuItemActionPerformed
-    Properties props =
-            ika.utils.PropertiesLoader.loadProperties("ika.app.Application.properties");
+    Properties props
+            = ika.utils.PropertiesLoader.loadProperties("ika.app.Application.properties");
     String url = props.getProperty("HelpWebPage");
     if (Desktop.isDesktopSupported()) {
         try {
@@ -2101,56 +2118,49 @@ private void voidValuesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     }
 }//GEN-LAST:event_voidValuesMenuItemActionPerformed
 
-private void readGUIAndFilter(boolean manuallyTriggeredFiltering) {
-    
-    boolean filter = manuallyTriggeredFiltering || !deferredFiltering;
-    CardLayout cl = (CardLayout)(centerPanel.getLayout());
-    cl.show(centerPanel, filter ? "map" : "filterButton");
-    filteringStatusLabel.setText("Filtering is deferred.");
-    updateEditMenu(); // enable Filter command
-    if (!filter) {
-        return;
-    }
+    private void readGUIAndFilter(boolean manuallyTriggeredFiltering) {
 
-    if (gridFilter.getGrid() == null) {
-        showNoTerrainMessage();
-    } else {
-        readGUI();
-        
-        if (adjustingGUI) {
+        boolean filter = manuallyTriggeredFiltering || !deferredFiltering;
+        CardLayout cl = (CardLayout) (centerPanel.getLayout());
+        cl.show(centerPanel, filter ? "map" : "filterButton");
+        filteringStatusLabel.setText("Filtering is deferred.");
+        updateEditMenu(); // enable Filter command
+        if (!filter) {
             return;
         }
 
-        // don't show the original grid, as no graphical response would be 
-        // visible after a change to the GUI
-        try {
-            adjustingGUI = true;
-            if (viewOriginalCheckBoxMenuItem.isSelected()) {
-                viewFinalCheckBoxMenuItem.setSelected(true);
-            }
-        } finally {
-            adjustingGUI = false;
-        }
+        if (gridFilter.getGrid() == null) {
+            showNoTerrainMessage();
+        } else {
+            readGUI();
 
-        try {
-            filter();
-        } catch (Throwable ex) {
-            String exmsg = ex.getMessage();
-            if (exmsg != null && exmsg.contains("user canceled")) {
+            if (adjustingGUI) {
                 return;
             }
-            String msg = "An error occured";
-            ErrorDialog.showErrorDialog(msg, errTitle(), ex, TerrainSculptorWindow.this);
+
+            // don't show the original grid, as no graphical response would be 
+            // visible after a change to the GUI
+            try {
+                adjustingGUI = true;
+                if (viewOriginalCheckBoxMenuItem.isSelected()) {
+                    viewFinalCheckBoxMenuItem.setSelected(true);
+                }
+            } finally {
+                adjustingGUI = false;
+            }
+
+            try {
+                filter();
+            } catch (Throwable ex) {
+                String exmsg = ex.getMessage();
+                if (exmsg != null && exmsg.contains("user canceled")) {
+                    return;
+                }
+                String msg = "An error occured";
+                ErrorDialog.showErrorDialog(msg, errTitle(), ex, TerrainSculptorWindow.this);
+            }
         }
     }
-}
-
-private void filterSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_filterSliderStateChanged
-    JSlider slider = (JSlider) evt.getSource();
-    if (!slider.getValueIsAdjusting() && !adjustingGUI) {
-        readGUIAndFilter(false);
-    }
-}//GEN-LAST:event_filterSliderStateChanged
 
 private void showPageCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showPageCheckBoxMenuItemActionPerformed
     boolean show = this.showPageCheckBoxMenuItem.isSelected();
@@ -2162,49 +2172,53 @@ private void filterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_filterButtonActionPerformed
 
 private void combinationSlopeThresholdSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_combinationSlopeThresholdSliderStateChanged
-    if (((JSlider) evt.getSource()).getValueIsAdjusting()) {
+    if (((JSlider) evt.getSource()).getValueIsAdjusting() || adjustingGUI) {
         return;
     }
     if (!viewCombinationCheckBoxMenuItem.isSelected()
             && !viewFinalCheckBoxMenuItem.isSelected()) {
         viewFinalCheckBoxMenuItem.setSelected(true);
     }
+    readGUIAndFilter(false);
 }//GEN-LAST:event_combinationSlopeThresholdSliderStateChanged
 
 private void viewMenuChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_viewMenuChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
         viewMenuButton.setText(menuItem.getText());
-    }    
+    }
 }//GEN-LAST:event_viewMenuChanged
 
 private void ridgesSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_ridgesSliderStateChanged
-    if (((JSlider) evt.getSource()).getValueIsAdjusting()) {
+    if (((JSlider) evt.getSource()).getValueIsAdjusting() || adjustingGUI) {
         return;
-    }            
+    }
     if (!viewMountainsCheckBoxMenuItem.isSelected()
             && !viewFinalCheckBoxMenuItem.isSelected()) {
         viewFinalCheckBoxMenuItem.setSelected(true);
     }
+    readGUIAndFilter(false);
 }//GEN-LAST:event_ridgesSliderStateChanged
 
 private void valleysSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_valleysSliderStateChanged
-    if (((JSlider) evt.getSource()).getValueIsAdjusting()) {
+    if (((JSlider) evt.getSource()).getValueIsAdjusting() || adjustingGUI) {
         return;
-    }            
+    }
     if (!viewLowlandsCheckBoxMenuItem.isSelected()
             && !viewFinalCheckBoxMenuItem.isSelected()) {
         viewFinalCheckBoxMenuItem.setSelected(true);
     }
+    readGUIAndFilter(false);
 }//GEN-LAST:event_valleysSliderStateChanged
 
 private void lodSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_lodSliderStateChanged
-    if (((JSlider) evt.getSource()).getValueIsAdjusting()) {
+    if (((JSlider) evt.getSource()).getValueIsAdjusting() || adjustingGUI) {
         return;
-    }            
-    if (viewOriginalCheckBoxMenuItem.isSelected()){
+    }
+    if (viewOriginalCheckBoxMenuItem.isSelected()) {
         viewFinalCheckBoxMenuItem.setSelected(true);
     }
+    readGUIAndFilter(false);
 }//GEN-LAST:event_lodSliderStateChanged
 
 private void infoMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_infoMenuItem1ActionPerformed
@@ -2212,7 +2226,7 @@ private void infoMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 }//GEN-LAST:event_infoMenuItem1ActionPerformed
 
 private void filterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterMenuItemActionPerformed
-    readGUIAndFilter(true);
+    readGUIAndFilter(false);
 }//GEN-LAST:event_filterMenuItemActionPerformed
 
 private void deferredFilteringCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deferredFilteringCheckBoxMenuItemActionPerformed
@@ -2233,14 +2247,13 @@ private void deferredFilteringCheckBoxMenuItemActionPerformed(java.awt.event.Act
 
         // retrieve the value of the windowModified property
         Boolean windowModified = null;
-        if (saveMenuItem != null && this.getRootPane() != null) {
-            windowModified =
-                    (Boolean) this.getRootPane().getClientProperty("windowModified");
+        if (saveMenuItem != null && getRootPane() != null) {
+            windowModified = (Boolean) getRootPane().getClientProperty("windowModified");
         }
 
         // enable or disable the saveMenu accordingly
         if (windowModified != null) {
-            this.saveMenuItem.setEnabled(windowModified.booleanValue());
+            this.saveMenuItem.setEnabled(windowModified);
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
