@@ -51,6 +51,21 @@ public abstract class AbstractRaster extends GeoObject {
     public double getCellSize() {
         return cellSize;
     }
+    
+    /**
+     * Returns the distance between two neighboring rows or columns. If the cell
+     * size is in spherical coordinates, the cell size is converted to meters.
+     * This conversion is approximate, as a spherical model of the Earth is
+     * used.
+     *
+     * @return the distance between two rows or columns
+     */
+    public double getProjectedCellSize() {
+        if (cellSize < 0.1) {
+            return Math.toRadians(cellSize) * 6371008.7714;
+        }
+        return cellSize;
+    }
 
     public void setCellSize(double cellSize) {
         if (cellSize <= 0) {
