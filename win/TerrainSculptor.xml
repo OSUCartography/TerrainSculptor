@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
@@ -9,15 +10,32 @@
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl>http://www.terraincartography.com/terrainsculptor/</supportUrl>
-  <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
   <icon>icons.ico</icon>
   <jre>
     <path></path>
-    <minVersion>1.6.0</minVersion>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.8.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
-    <maxHeapSize>1200</maxHeapSize>
+    <runtimeBits>64/32</runtimeBits>
+    <maxHeapPercent>80</maxHeapPercent>
   </jre>
+  <versionInfo>
+    <fileVersion>2.1.2.0</fileVersion>
+    <txtFileVersion>2.1.2</txtFileVersion>
+    <fileDescription>Terrain Sculptor</fileDescription>
+    <copyright>Bernhard Jenny</copyright>
+    <productVersion>2.1.2.0</productVersion>
+    <txtProductVersion>2.1.2</txtProductVersion>
+    <productName>Terrain Sculptor</productName>
+    <companyName></companyName>
+    <internalName>Terrain Sculptor</internalName>
+    <originalFilename>TerrainSculptor.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
 </launch4jConfig>

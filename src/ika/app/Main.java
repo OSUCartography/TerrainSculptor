@@ -8,12 +8,9 @@ import ika.geo.grid.TerrainSculptorFilter;
 import ika.geoexport.ESRIASCIIGridExporter;
 import ika.geoimport.ESRIASCIIGridReader;
 import ika.gui.*;
-import ika.utils.ErrorDialog;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Main entry point.
